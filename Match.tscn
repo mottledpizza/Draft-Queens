@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://j0qk282owgqk"]
+
+[ext_resource type="Script" uid="uid://c16y7vjho8vfb" path="res://scripts/match_controler.gd" id="1_0kpuf"]
+[ext_resource type="Script" uid="uid://0vbxsligdpkh" path="res://jesus_luzardo.gd" id="2_rb14p"]
+[ext_resource type="Script" uid="uid://bpuk7pbct1vsl" path="res://average_batter.gd" id="3_pq8d4"]
+
+[node name="Control" type="Control" unique_id=73089869]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG" type="ColorRect" parent="." unique_id=724348981]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.33, 0.3525, 0.6, 1)
+
+[node name="output container" type="MarginContainer" parent="." unique_id=2002445591]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="Announcer" type="Label" parent="output container" unique_id=1348272730]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "WEEEE WOO"
+
+[node name="Match Controler" type="Control" parent="output container" unique_id=1886947151 node_paths=PackedStringArray("team_1", "team_2")]
+layout_mode = 2
+script = ExtResource("1_0kpuf")
+team_1 = NodePath("Jesus Luzardo")
+team_2 = NodePath("Average Batter")
+
+[node name="Jesus Luzardo" type="Control" parent="output container/Match Controler" unique_id=1927206155]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_rb14p")
+
+[node name="Average Batter" type="Control" parent="output container/Match Controler" unique_id=46130476]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_pq8d4")
