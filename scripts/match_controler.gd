@@ -23,7 +23,6 @@ func Pitch() -> void:
 	var gravity = calc_grav(thrown_pitch, team_1.pitching_speeds[thrown_pitch])
 	var projected_target = target + gravity - get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
 	print(target)
-
 	projected_target = throw(projected_target, thrown_pitch)
 	#lets see if the ball is in the strike box
 	if projected_target.x > (strike_zone.x/2) || projected_target.y > (strike_zone.y/2) || projected_target.x < -(strike_zone.x/2) || projected_target.y < -(strike_zone.y/2):
@@ -39,8 +38,8 @@ func throw(target: Vector2,thrown_pitch: String):
 	
 	#calc the accuracy of the throw
 	var accuracy = 1 - team_1.accuracy/100
-	target.x = target.x + rng.randf_range(-(abs(target.x * accuracy) + (pitch_speed - 70)/10),abs(target.x * accuracy) + (pitch_speed - 70)/10)
-	target.y = target.y + rng.randf_range(-(abs(target.y * accuracy) + (pitch_speed - 70)/10),abs(target.y * accuracy) + (pitch_speed - 70)/10)
+	target.x = target.x + rng.randf_range(-(abs(target.x * accuracy) + (pitch_speed - 60)/10),abs(target.x * accuracy) + (pitch_speed - 60)/10)
+	target.y = target.y + rng.randf_range(-(abs(target.y * accuracy) + (pitch_speed - 60)/10),abs(target.y * accuracy) + (pitch_speed - 60)/10)
 	
 	target = target + get_pitch_spin(thrown_pitch, rng.randfn(team_1.pitching_sauce)) - calc_grav(thrown_pitch,pitch_speed)
 	print(target)
@@ -61,6 +60,7 @@ func get_pitch_spin(pitch: String, pitch_sauce: float):
 		return pitch_type_info["R_Pitch"] * (pitch_sauce/100)
 	if team_1.pitch_dominant_hand == "L":
 		return pitch_type_info["L_Pitch"] * (pitch_sauce/100)
+
 
 #takes the perfered pitches in the player script and connectes them to the pitch arsenals to select a pitch
 func select_pitch():
