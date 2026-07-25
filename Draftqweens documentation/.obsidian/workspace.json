@@ -24,17 +24,21 @@
         ]
       },
       {
-        "id": "b13b7ca270474fc1",
+        "id": "f5459a5e6186cac6",
         "type": "tabs",
         "children": [
           {
-            "id": "d522c26f851965e9",
+            "id": "6a4531eeb964c087",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Match controller process.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Match controller process"
             }
           }
         ]
@@ -201,10 +205,10 @@
   },
   "active": "c42e7a1bdb0e83f2",
   "lastOpenFiles": [
+    "Match controller process.md",
+    "Draftqueens MAIN DOC.md",
     "Appendix with stat definitions.md",
     "Pitching.md",
-    "Match controller docuwomentation.md",
-    "Draftqueens MAIN DOC.md",
     "Batting.md",
     "Untitled.canvas"
   ]
