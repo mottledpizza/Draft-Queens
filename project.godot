@@ -25,6 +25,10 @@ Pitches="*uid://b24pa8q11hv3o"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[dotnet]
+
+project/assembly_name="BASEBALL"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
