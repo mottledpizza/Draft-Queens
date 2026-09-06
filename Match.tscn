@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://j0qk282owgqk"]
 
 [ext_resource type="Script" uid="uid://c16y7vjho8vfb" path="res://scripts/match_controler.gd" id="1_0kpuf"]
+[ext_resource type="Script" uid="uid://c0vvnc4b0q5qv" path="res://SQLController.gd" id="1_a1ov8"]
 [ext_resource type="Script" uid="uid://0vbxsligdpkh" path="res://jesus_luzardo.gd" id="2_rb14p"]
 [ext_resource type="Script" uid="uid://bpuk7pbct1vsl" path="res://average_batter.gd" id="3_pq8d4"]
 
@@ -11,6 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_a1ov8")
 
 [node name="BG" type="ColorRect" parent="." unique_id=724348981]
 layout_mode = 1
