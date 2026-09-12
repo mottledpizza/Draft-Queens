@@ -6,6 +6,8 @@ var height: float
 var age: int
 
 
+
+
 #pitching attributes
 var pitch_dominant_hand: String
 var pitching_arsenal: Array
@@ -54,3 +56,21 @@ var perfered_pitches = {
 
 
 #Batting stats
+#perfered bat:
+#wood required by mlb, common ones being Maple, Ash, and Birch
+var bat_material: String
+#in ounces, averages 31-34 depending on height
+var bat_weight: int
+#in inches, averages 32 to 34
+var bat_length: int
+#in inches, maximum 2.61
+var bat_diameter: float
+#player stats
+#in feet, average of 7.3, goes from 4 to 10
+var swing_length: float
+#in mph the longer the length the faster the swing generally.
+var bat_speed: float
+#in milliseconds 
+var reaction_speed: int 
+#a percentage, can go over 100, increases the chance to predict what ball is being thrown
+var batting_compitence: float

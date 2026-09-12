@@ -5,9 +5,22 @@ extends Control
 
 var rng = RandomNumberGenerator.new()
 var strike_zone: Vector3
+var ball_target: Vector2
+var pitch_speed: float
 
 func _ready() -> void:
 	Pitch()
+	Bat()
+
+
+func Bat() -> void:
+	#i/s -> i/ms
+	var time_to_react = 766 / ((pitch_speed * 17.6)/1000)
+	time_to_react = time_to_react - ((team_2.swing_length * 12) / ((team_2.bat_speed * 17.6)/1000)) - 125
+	var can_react = false
+	if time_to_react > team_2.reaction_speed:
+		can_react = true
+	
 
 
 func Pitch() -> void:
@@ -22,7 +35,7 @@ func Pitch() -> void:
 	
 	var gravity = calc_grav(thrown_pitch, team_1.pitching_speeds[thrown_pitch])
 	var projected_target = target + gravity - get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
-	print(target)
+	ball_target = projected_target
 	projected_target = throw(projected_target, thrown_pitch)
 	#lets see if the ball is in the strike box
 	if projected_target.x > (strike_zone.x/2) || projected_target.y > (strike_zone.y/2) || projected_target.x < -(strike_zone.x/2) || projected_target.y < -(strike_zone.y/2):
@@ -33,7 +46,7 @@ func Pitch() -> void:
 
 
 func throw(target: Vector2,thrown_pitch: String):
-	var pitch_speed = snapped(rng.randfn(team_1.pitching_speeds[thrown_pitch], 2.0), 0.01)
+	pitch_speed = snapped(rng.randfn(team_1.pitching_speeds[thrown_pitch], 2.0), 0.01)
 	var inches_per_sec = pitch_speed * 17.6
 	
 	#calc the accuracy of the throw
