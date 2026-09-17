@@ -7,6 +7,7 @@ var rng = RandomNumberGenerator.new()
 var strike_zone: Vector3
 var ball_target: Vector2
 var pitch_speed: float
+var thrown_pitch: String
 
 func _ready() -> void:
 	Pitch()
@@ -20,11 +21,21 @@ func Bat() -> void:
 	var can_react = false
 	if time_to_react > team_2.reaction_speed:
 		can_react = true
+	var guessed_pitch = predictPitch(can_react)
+	print(guessed_pitch)
+
+func predictPitch(can_react: bool ):
+	var predictedPitch: String
+	if !can_react: 
+		predictedPitch = select_pitch()
+	else:
+		predictedPitch = select_pitch(thrown_pitch, team_2.batting_compitence)
+	return predictedPitch
 	
 
 
 func Pitch() -> void:
-	var thrown_pitch = select_pitch()
+	thrown_pitch = select_pitch()
 	print(thrown_pitch)
 	
 	strike_zone = Baseball.get_strikezone(team_2.height)
@@ -42,7 +53,6 @@ func Pitch() -> void:
 		print("Ball!")
 	else:
 		print("Strike!")
-	#print(get_pitch_spin(thrown_pitch))
 
 
 func throw(target: Vector2,thrown_pitch: String):
@@ -75,13 +85,16 @@ func get_pitch_spin(pitch: String, pitch_sauce: float):
 		return pitch_type_info["L_Pitch"] * (pitch_sauce/100)
 
 
-#takes the perfered pitches in the player script and connectes them to the pitch arsenals to select a pitch
-func select_pitch():
+#takes the perfered pitches in the player script and connects them to the pitch arsenals to select a pitch
+func select_pitch(thrownpitch: String = "null", competence: float = 0.0 ):
 	var pitcher_arsenal: Array = team_1.pitching_arsenal.duplicate()
 	var pitch_weights: PackedFloat32Array
 	
 	#set the weights for all of the perfered pitches
 	for i in pitcher_arsenal.size():
-		pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]])
+		if thrownpitch == pitcher_arsenal[i]:
+			pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]] * (((competence/2)/100) + 1 ))
+		else:
+			pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]])
 	
 	return pitcher_arsenal[rng.rand_weighted(pitch_weights)]
