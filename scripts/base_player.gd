@@ -56,15 +56,6 @@ var perfered_pitches = {
 
 
 #Batting stats
-#perfered bat:
-#wood required by mlb, common ones being Maple, Ash, and Birch
-var bat_material: String
-#in ounces, averages 31-34 depending on height
-var bat_weight: int
-#in inches, averages 32 to 34
-var bat_length: int
-#in inches, maximum 2.61
-var bat_diameter: float
 #player stats
 #in feet, average of 7.3, goes from 4 to 10
 var swing_length: float
@@ -74,3 +65,21 @@ var bat_speed: float
 var reaction_speed: int 
 #a percentage, can go over 100, increases the chance to predict what ball is being thrown
 var batting_compitence: float
+
+
+
+#Functions:
+func getBat():
+	var bat = null
+	for i in get_children().size():
+		if get_child(i).is_class("base_bat"):
+			bat = get_child(i)
+	if bat == null:
+		print("Error: No Bat Found")
+		return
+	else:
+		return bat
+	
+	
+	
+	

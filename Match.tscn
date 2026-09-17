@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://c0vvnc4b0q5qv" path="res://SQLController.gd" id="1_a1ov8"]
 [ext_resource type="Script" uid="uid://0vbxsligdpkh" path="res://scripts/jesus_luzardo.gd" id="2_rb14p"]
 [ext_resource type="Script" uid="uid://bpuk7pbct1vsl" path="res://scripts/average_batter.gd" id="3_pq8d4"]
+[ext_resource type="Script" uid="uid://dlvw7qsr12myo" path="res://sample_bat.gd" id="5_ru5bp"]
 
 [node name="Control" type="Control" unique_id=73089869]
 layout_mode = 3
@@ -57,3 +58,9 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("3_pq8d4")
+
+[node name="sample_bat" type="Control" parent="output container/Match Controler/Average Batter" unique_id=852749671]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_ru5bp")
