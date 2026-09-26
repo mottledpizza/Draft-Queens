@@ -65,6 +65,8 @@ var bat_speed: float
 var reaction_speed: int 
 #a percentage, can go over 100, increases the chance to predict what ball is being thrown
 var batting_compitence: float
+#average angle at which the batter swings the bat
+var tilt: float
 
 
 

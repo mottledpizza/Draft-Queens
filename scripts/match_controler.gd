@@ -23,6 +23,20 @@ func Bat() -> void:
 		can_react = true
 	var guessed_pitch = predictPitch(can_react)
 	print(guessed_pitch)
+	swingBat(guessed_pitch)
+	
+
+#IMPORTANT: DAVID! put the formula in this func pretty please
+func calcBatPhysics(ball_velocity: float, bat_velocity: float, bat_length: float):
+	pass
+
+func swingBat(guessed_pitch: String):
+	var target = Vector2.ZERO
+	target = ball_target + get_pitch_spin(guessed_pitch, team_1.pitching_sauce) - calc_grav(guessed_pitch,pitch_speed)
+	print("I'm Gonna Hit Here! ", target)
+	
+	
+
 
 func predictPitch(can_react: bool ):
 	var predictedPitch: String
@@ -48,6 +62,7 @@ func Pitch() -> void:
 	var projected_target = target + gravity - get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
 	ball_target = projected_target
 	projected_target = throw(projected_target, thrown_pitch)
+	print("The Ball is Going Here! ",projected_target)
 	#lets see if the ball is in the strike box
 	if projected_target.x > (strike_zone.x/2) || projected_target.y > (strike_zone.y/2) || projected_target.x < -(strike_zone.x/2) || projected_target.y < -(strike_zone.y/2):
 		print("Ball!")
@@ -65,7 +80,6 @@ func throw(target: Vector2,thrown_pitch: String):
 	target.y = target.y + rng.randf_range(-(abs(target.y * accuracy) + (pitch_speed - 60)/10),abs(target.y * accuracy) + (pitch_speed - 60)/10)
 	
 	target = target + get_pitch_spin(thrown_pitch, rng.randfn(team_1.pitching_sauce)) - calc_grav(thrown_pitch,pitch_speed)
-	print(target)
 	return target
 
 func calc_grav(pitch: String, speed: float):
@@ -98,3 +112,9 @@ func select_pitch(thrownpitch: String = "null", competence: float = 0.0 ):
 			pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]])
 	
 	return pitcher_arsenal[rng.rand_weighted(pitch_weights)]
+
+func getWhereBallThrownFrom():
+	var gravity = calc_grav(thrown_pitch, team_1.pitching_speeds[thrown_pitch])
+	var spot_thrown_from = ball_target - gravity + get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
+	return spot_thrown_from
+	
