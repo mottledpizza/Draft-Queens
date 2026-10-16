@@ -23,20 +23,46 @@ func Bat() -> void:
 		can_react = true
 	var guessed_pitch = predictPitch(can_react)
 	print(guessed_pitch)
-	swingBat(guessed_pitch)
+	swingBat(guessed_pitch, 766 / ((pitch_speed * 17.6)/1000))
 	
 
 #IMPORTANT: DAVID! put the formula in this func pretty please
 func calcBatPhysics(ball_velocity: float, bat_velocity: float, bat_length: float):
 	pass
 
-func swingBat(guessed_pitch: String):
+func swingBat(guessed_pitch: String, ball_time: float):
 	var target = Vector2.ZERO
 	target = ball_target + get_pitch_spin(guessed_pitch, team_1.pitching_sauce) - calc_grav(guessed_pitch,pitch_speed)
 	print("I'm Gonna Hit Here! ", target)
+	var predicted_time_to_hit = snapped(rng.randfn(team_1.pitching_speeds[guessed_pitch], 2.0), 0.01)
+	predicted_time_to_hit = 766 / ((predicted_time_to_hit * 17.6)/1000)
+	print("time to hit: ",predicted_time_to_hit)
+	print("ball time: ", ball_time)
 	
-	
+	if (predicted_time_to_hit - ball_time) < 0:
+		#fyi it technically should be based off of the speed of the swing and the ball but uhhh i don't really care :P
+		var distance_offset = (ball_time - predicted_time_to_hit)/2
+		batRot(predicted_time_to_hit,distance_offset)
+		
+		print("Swing is faster")
+	elif (predicted_time_to_hit - ball_time) > 0:
+		var distance_offset = (predicted_time_to_hit - ball_time)/2
+		batRot(predicted_time_to_hit,-distance_offset)
+		print("Ball is faster!")
+	elif (predicted_time_to_hit - ball_time) == 0:
+		#statistically impossible... but just in case 
+		print("Perfect!")
 
+#gets the bat X angle
+func batRot(time_to_hit: float, offset: float):
+	var bat_speed = team_2.swing_length / time_to_hit
+	var new_distance = (bat_speed * offset) * 12
+	var diamiter = team_2.getBat().bat_length * 2
+	var rads = new_distance / (diamiter/2)
+	var degree = rads * (180/PI)
+	
+	print("degree ", degree)
+	
 
 func predictPitch(can_react: bool ):
 	var predictedPitch: String
@@ -45,8 +71,6 @@ func predictPitch(can_react: bool ):
 	else:
 		predictedPitch = select_pitch(thrown_pitch, team_2.batting_compitence)
 	return predictedPitch
-	
-
 
 func Pitch() -> void:
 	thrown_pitch = select_pitch()

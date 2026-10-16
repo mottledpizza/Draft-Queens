@@ -74,11 +74,11 @@ var tilt: float
 func getBat():
 	var bat = null
 	for i in get_children().size():
-		if get_child(i).is_class("base_bat"):
+		if get_child(i).get_script().get_base_script().get_global_name() == "base_bat":
 			bat = get_child(i)
 	if bat == null:
 		print("Error: No Bat Found")
-		return
+		return null
 	else:
 		return bat
 	
