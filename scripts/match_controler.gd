@@ -44,8 +44,7 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 	print("Ball Velocity is: ",ball_velocity)
 	print("Bat Velocity is: ", bat_velocity)
 	print("Bat Length is: ", bat_length)
-	
-	pass
+
 
 func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_speed: float, bat_speed: float):
 	var target = Vector2.ZERO
@@ -88,20 +87,20 @@ func batRot(time_to_hit: float, offset: float):
 	var degree_x = rads_x * (180/PI)
 	var degree_y = -(team_2.tilt + rng.randf_range(-1,1)) - abs(degree_x)
 	
-	var anglesOut: PackedFloat32Array
-	anglesOut.append(degree_x)
-	anglesOut.append(degree_y)
+	var angles_out: PackedFloat32Array
+	angles_out.append(degree_x)
+	angles_out.append(degree_y)
 	print("Y degree ", degree_y)
 	print("X degree ", degree_x)
-	return anglesOut
+	return angles_out
 
 func predictPitch(can_react: bool ):
-	var predictedPitch: String
+	var predicted_pitch: String
 	if !can_react: 
-		predictedPitch = select_pitch()
+		predicted_pitch = select_pitch()
 	else:
-		predictedPitch = select_pitch(thrown_pitch, team_2.batting_compitence)
-	return predictedPitch
+		predicted_pitch = select_pitch(thrown_pitch, team_2.batting_compitence)
+	return predicted_pitch
 
 func Pitch():
 	thrown_pitch = select_pitch()
@@ -151,13 +150,13 @@ func get_pitch_spin(pitch: String, pitch_sauce: float):
 
 
 #takes the perfered pitches in the player script and connects them to the pitch arsenals to select a pitch
-func select_pitch(thrownpitch: String = "null", competence: float = 0.0 ):
+func select_pitch(thrown_pitch: String = "null", competence: float = 0.0 ):
 	var pitcher_arsenal: Array = team_1.pitching_arsenal.duplicate()
 	var pitch_weights: PackedFloat32Array
 	
 	#set the weights for all of the perfered pitches
 	for i in pitcher_arsenal.size():
-		if thrownpitch == pitcher_arsenal[i]:
+		if thrown_pitch == pitcher_arsenal[i]:
 			pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]] * (((competence/2)/100) + 1 ))
 		else:
 			pitch_weights.append(team_1.perfered_pitches[pitcher_arsenal[i]])
@@ -178,42 +177,42 @@ func createBatPoints(target: Vector2):
 	var vec2: Vector2
 	#array is formated that 0 is the top of the tip, 1 is the bottom of the tip
 	#2 is top of handle 3 is bottom of handle
-	var batPoints = []
+	var bat_points = []
 	vec2 = origin
 	vec2.x += bat.sweet_spot
 	vec2.y += height
-	batPoints.append(vec2)
+	bat_points.append(vec2)
 	vec2 = origin
 	vec2.x += bat.sweet_spot
 	vec2.y -= height
-	batPoints.append(vec2)
+	bat_points.append(vec2)
 	vec2 = origin
 	vec2.x -= length - bat.sweet_spot
 	vec2.y += height
-	batPoints.append(vec2)
+	bat_points.append(vec2)
 	vec2 = origin
 	vec2.x -= length - bat.sweet_spot
 	vec2.y -= height
-	batPoints.append(vec2)
+	bat_points.append(vec2)
 	#fuck dis shit^^^^
-	print("batPoints are: ", batPoints)
-	return batPoints
+	print("bat_points are: ", bat_points)
+	return bat_points
 
-func rotateBatFuction(batPoints: Array, Angle: float, target: Vector2):
+func rotateBatFuction(bat_points: Array, Angle: float, target: Vector2):
 	var origin = target
 	Angle = Angle * (PI/180)
-	for i in batPoints.size():
-		var vec2 = batPoints[i]
+	for i in bat_points.size():
+		var vec2 = bat_points[i]
 		vec2 -= target
 		vec2.x = (vec2.x * cos(Angle)) - (vec2.y * sin(Angle))
 		vec2.y = (vec2.y * cos(Angle)) + (vec2.x * sin(Angle))
 		vec2 += target
-		batPoints[i] = vec2
-	print("Angled bat is: ",batPoints)
-	return batPoints
+		bat_points[i] = vec2
+	print("Angled bat is: ",bat_points)
+	return bat_points
 
-func doesBallHitBat(pointsIn: Array, target: Vector2):
-	if Geometry2D.is_point_in_polygon(target,pointsIn):
+func doesBallHitBat(points_in: Array, target: Vector2):
+	if Geometry2D.is_point_in_polygon(target,points_in):
 		print("HIT")
 	else:
 		print("STRIKE")
