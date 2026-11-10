@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 Baseball="*uid://b4xxkuya4x8ep"
 Pitches="*uid://b24pa8q11hv3o"
+LogConfig="*uid://bv36lhluil4ju"
+SignalBus="*uid://dxw6tunoj4c4k"
 
 [display]
 

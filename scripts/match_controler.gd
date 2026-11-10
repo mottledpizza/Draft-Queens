@@ -10,8 +10,32 @@ var pitch_speed: float
 var thrown_pitch: String
 
 func _ready() -> void:
+	SignalBus.StartGame.connect(playDaGame)
+	playDaGame()
+
+func playDaGame():
 	var target = Pitch()
 	Bat(target)
+
+func Pitch():
+	thrown_pitch = select_pitch()
+	if LogConfig.pitch_config == true:
+		print(thrown_pitch)
+	
+	strike_zone = Baseball.get_strikezone(team_2.height)
+	if LogConfig.pitch_config == true:
+		print(strike_zone)
+	var target = Vector2.ZERO
+	target.x = rng.randf_range(-(strike_zone.x/2) + 2,(strike_zone.x/2) + 2)
+	target.y = rng.randf_range(-(strike_zone.y/2) + 2,(strike_zone.y/2) + 2)
+	
+	var gravity = calc_grav(thrown_pitch, team_1.pitching_speeds[thrown_pitch])
+	var projected_target = target + gravity - get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
+	ball_target = projected_target
+	projected_target = throw(projected_target, thrown_pitch)
+	if LogConfig.pitch_config == true:
+		print("The Ball is Going Here! ",projected_target)
+	return projected_target
 
 
 func Bat(target: Vector2) -> void:
@@ -24,7 +48,8 @@ func Bat(target: Vector2) -> void:
 	if time_to_react > team_2.reaction_speed:
 		can_react = true
 	var guessed_pitch = predictPitch(can_react)
-	print(guessed_pitch)
+	if LogConfig.bat_config == true:
+		print(guessed_pitch)
 	swingBat(guessed_pitch, 766 / ((pitch_speed * 17.6)/1000), target, pitch_speed, bat_speed)
 	
 	
@@ -33,27 +58,30 @@ func Bat(target: Vector2) -> void:
 func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
 ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float):
 	#bunch o nonsense, kill it all when you put in the equasion (womp womp too many typos)
-	print("Bat X Angle is: ", bat_x_angle)
-	print("Bat Y Angle is: ", bat_y_angle)
-	print("Ball Height is: ", ball_height)
-	print("Bat Height is: ", bat_height)
-	print("Ball Diameter is: ", ball_diameter)
-	print("Bat Diameter is: ", bat_diameter)
-	print("Ball Mass is: ", ball_mass)
-	print("Bat Mass is: ", bat_mass)
-	print("Ball Velocity is: ",ball_velocity)
-	print("Bat Velocity is: ", bat_velocity)
-	print("Bat Length is: ", bat_length)
+	if LogConfig.bat_config == true:
+		print("Bat X Angle is: ", bat_x_angle)
+		print("Bat Y Angle is: ", bat_y_angle)
+		print("Ball Height is: ", ball_height)
+		print("Bat Height is: ", bat_height)
+		print("Ball Diameter is: ", ball_diameter)
+		print("Bat Diameter is: ", bat_diameter)
+		print("Ball Mass is: ", ball_mass)
+		print("Bat Mass is: ", bat_mass)
+		print("Ball Velocity is: ",ball_velocity)
+		print("Bat Velocity is: ", bat_velocity)
+		print("Bat Length is: ", bat_length)
 
 
 func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_speed: float, bat_speed: float):
 	var target = Vector2.ZERO
 	target = ball_target + get_pitch_spin(guessed_pitch, team_1.pitching_sauce) - calc_grav(guessed_pitch,pitch_speed)
-	print("I'm Gonna Hit Here! ", target)
+	if LogConfig.bat_config == true:
+		print("I'm Gonna Hit Here! ", target)
 	var predicted_time_to_hit = snapped(rng.randfn(team_1.pitching_speeds[guessed_pitch], 2.0), 0.01)
 	predicted_time_to_hit = 766 / ((predicted_time_to_hit * 17.6)/1000)
-	print("time to hit: ",predicted_time_to_hit)
-	print("ball time: ", ball_time)
+	if LogConfig.bat_config == true:
+		print("time to hit: ",predicted_time_to_hit)
+		print("ball time: ", ball_time)
 	
 	var batPoints: Array
 	var angles: PackedFloat32Array
@@ -63,16 +91,19 @@ func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_s
 		angles = batRot(predicted_time_to_hit,distance_offset)
 		batPoints = createBatPoints(target)
 		batPoints = rotateBatFuction(batPoints,angles[1], ball_strike_point)
-		print("Swing is faster")
+		if LogConfig.bat_config == true:
+			print("Swing is faster")
 	elif (predicted_time_to_hit - ball_time) > 0:
 		var distance_offset = (predicted_time_to_hit - ball_time)/2
 		angles = batRot(predicted_time_to_hit,-distance_offset)
 		batPoints = createBatPoints(target)
 		batPoints = rotateBatFuction(batPoints,angles[1], ball_strike_point)
-		print("Ball is faster!")
+		if LogConfig.bat_config == true:
+			print("Ball is faster!")
 	elif (predicted_time_to_hit - ball_time) == 0:
 		#statistically impossible... but just in case 
-		print("Perfect!")
+		if LogConfig.bat_config == true:
+			print("Perfect!")
 	doesBallHitBat(batPoints, target)
 	calcBatPhysics(angles[0],angles[1],ball_strike_point.y,target.y,Baseball.BALL_DIAMETER,team_2.getBat().bat_diameter,
 	Baseball.BALL_WEIGHT,team_2.getBat().bat_weight, pitch_speed, bat_speed, team_2.getBat().bat_length)
@@ -90,8 +121,9 @@ func batRot(time_to_hit: float, offset: float):
 	var angles_out: PackedFloat32Array
 	angles_out.append(degree_x)
 	angles_out.append(degree_y)
-	print("Y degree ", degree_y)
-	print("X degree ", degree_x)
+	if LogConfig.bat_config == true:
+		print("Y degree ", degree_y)
+		print("X degree ", degree_x)
 	return angles_out
 
 func predictPitch(can_react: bool ):
@@ -101,23 +133,6 @@ func predictPitch(can_react: bool ):
 	else:
 		predicted_pitch = select_pitch(thrown_pitch, team_2.batting_compitence)
 	return predicted_pitch
-
-func Pitch():
-	thrown_pitch = select_pitch()
-	print(thrown_pitch)
-	
-	strike_zone = Baseball.get_strikezone(team_2.height)
-	print(strike_zone)
-	var target = Vector2.ZERO
-	target.x = rng.randf_range(-(strike_zone.x/2) + 2,(strike_zone.x/2) + 2)
-	target.y = rng.randf_range(-(strike_zone.y/2) + 2,(strike_zone.y/2) + 2)
-	
-	var gravity = calc_grav(thrown_pitch, team_1.pitching_speeds[thrown_pitch])
-	var projected_target = target + gravity - get_pitch_spin(thrown_pitch,team_1.pitching_sauce)
-	ball_target = projected_target
-	projected_target = throw(projected_target, thrown_pitch)
-	print("The Ball is Going Here! ",projected_target)
-	return projected_target
 
 
 func throw(target: Vector2,thrown_pitch: String):
@@ -195,7 +210,8 @@ func createBatPoints(target: Vector2):
 	vec2.y -= height
 	bat_points.append(vec2)
 	#fuck dis shit^^^^
-	print("bat_points are: ", bat_points)
+	if LogConfig.bat_config == true:
+		print("bat_points are: ", bat_points)
 	return bat_points
 
 func rotateBatFuction(bat_points: Array, Angle: float, target: Vector2):
@@ -208,7 +224,8 @@ func rotateBatFuction(bat_points: Array, Angle: float, target: Vector2):
 		vec2.y = (vec2.y * cos(Angle)) + (vec2.x * sin(Angle))
 		vec2 += target
 		bat_points[i] = vec2
-	print("Angled bat is: ",bat_points)
+	if LogConfig.bat_config == true:
+		print("Angled bat is: ",bat_points)
 	return bat_points
 
 func doesBallHitBat(points_in: Array, target: Vector2):

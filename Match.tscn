@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://0vbxsligdpkh" path="res://scripts/jesus_luzardo.gd" id="2_rb14p"]
 [ext_resource type="Script" uid="uid://bpuk7pbct1vsl" path="res://scripts/average_batter.gd" id="3_pq8d4"]
 [ext_resource type="Script" uid="uid://dlvw7qsr12myo" path="res://sample_bat.gd" id="5_ru5bp"]
+[ext_resource type="Script" uid="uid://c748yvtdurj1b" path="res://button.gd" id="6_n7dpw"]
 
 [node name="Control" type="Control" unique_id=73089869]
 layout_mode = 3
@@ -64,3 +65,22 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("5_ru5bp")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1655857132]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 20
+
+[node name="Button" type="Button" parent="MarginContainer" unique_id=1308758761]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "AGAIN!"
+script = ExtResource("6_n7dpw")
+
+[connection signal="button_down" from="MarginContainer/Button" to="MarginContainer/Button" method="_on_button_down"]
