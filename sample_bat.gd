@@ -7,3 +7,4 @@ func _init() -> void:
 	bat_weight = 73
 	bat_length = 32
 	bat_diameter = 2.61
+	sweet_spot = 6

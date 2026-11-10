@@ -10,3 +10,5 @@ var bat_weight: int
 var bat_length: int
 #in inches, maximum 2.61
 var bat_diameter: float
+# in inches, is the center of the zone of the bat, subtracted from the tip of the bat
+var sweet_spot: int 
