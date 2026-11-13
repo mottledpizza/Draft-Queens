@@ -6,8 +6,6 @@ var height: float
 var age: int
 
 
-
-
 #pitching attributes
 var pitch_dominant_hand: String
 var pitching_arsenal: Array
@@ -54,7 +52,6 @@ var perfered_pitches = {
 	"Slurve": 0
 }
 
-
 #Batting stats
 #player stats
 #in feet, average of 7.3, goes from 4 to 10
@@ -68,6 +65,7 @@ var batting_compitence: float
 #average angle at which the batter swings the bat
 var tilt: float
 
+#Fielding Stats
 
 
 #Functions:
