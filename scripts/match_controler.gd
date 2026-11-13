@@ -56,10 +56,12 @@ func Bat(target: Vector2) -> void:
 #IMPORTANT: DAVID! put the formula in this func pretty please
 func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
 ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float):
+	var final_ball_velocity
 	#bunch o nonsense, kill it all when you put in the equasion (womp womp too many typos)
 	if LogConfig.bat_config == true:
 		print("Bat X Angle is: ", bat_x_angle)
 		print("Bat Y Angle is: ", bat_y_angle)
+		#bat y angle is tilt
 		print("Ball Height is: ", ball_height)
 		print("Bat Height is: ", bat_height)
 		print("Ball Diameter is: ", ball_diameter)
@@ -69,6 +71,47 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Ball Velocity is: ",ball_velocity)
 		print("Bat Velocity is: ", bat_velocity)
 		print("Bat Length is: ", bat_length)
+	
+	if (abs(ball_height-bat_height) >= (ball_diameter+bat_diameter)):
+		final_ball_velocity = Vector3(-ball_velocity, 0, 0)
+		if LogConfig.bat_config == true:
+			print("strike")
+			print("final_ball_velocity: ", final_ball_velocity)
+		return Vector3(-ball_velocity, 0, 0)
+	
+	#calculate angle of collision
+	var angle_of_collision = asin((ball_height-bat_height)/(ball_diameter+bat_diameter))
+	
+	#find hit aligned velocity of bat and ball (only velocity that affects collision)
+	var bat_hit_aligned_initial_velocity = cos(angle_of_collision - bat_y_angle) * bat_velocity
+	var ball_hit_aligned_initial_velocity = cos(angle_of_collision) * cos(bat_x_angle) * ball_velocity
+	
+	#calculate final ball hit aligned velocity
+	var coefficient_of_restitution = .7 #LOL #TODO: LOL
+	var ball_hit_aligned_final_velocity = ((bat_mass*bat_hit_aligned_initial_velocity) + (ball_mass*ball_hit_aligned_initial_velocity) + (bat_mass*coefficient_of_restitution*(bat_hit_aligned_initial_velocity-ball_hit_aligned_initial_velocity)))/(bat_mass+ball_mass)
+	
+	#okay time to reconstruct the velocity into its constituent parts
+	# since we decomposed the ball velocity twice to align it with the hit, the remaining velocity is
+	 #the addition of two vectors
+	var ball_hit_normal_velocity = sqrt(pow(sin(angle_of_collision) * ball_velocity, 2.0) + pow(cos(angle_of_collision) * sin(bat_x_angle) * ball_velocity, 2.0))
+	
+	#decomp :)
+	var ball_hit_aligned_final_velocity_x = cos(bat_x_angle) * cos(angle_of_collision) * ball_hit_aligned_final_velocity
+	var ball_hit_normal_final_velocity_x = sin(bat_x_angle) * cos(angle_of_collision) * ball_hit_normal_velocity * -1 #(presumably negative)
+	
+	var ball_hit_aligned_final_velocity_y = cos(bat_x_angle) * sin(angle_of_collision) * ball_hit_aligned_final_velocity
+	var ball_hit_normal_final_velocity_y = cos(bat_x_angle) * sin(angle_of_collision) * ball_hit_normal_velocity
+	
+	var ball_hit_aligned_final_velocity_z = sin(bat_x_angle) * cos(angle_of_collision) * ball_hit_aligned_final_velocity
+	var ball_hit_normal_final_velocity_z = cos(bat_x_angle) * cos(angle_of_collision) * ball_hit_normal_velocity * (bat_x_angle / abs(bat_x_angle))
+	#added sign on x angle manually to normal velocity
+	
+	final_ball_velocity = Vector3(ball_hit_aligned_final_velocity_x + ball_hit_normal_final_velocity_x, ball_hit_aligned_final_velocity_y + ball_hit_normal_final_velocity_y, ball_hit_aligned_final_velocity_z + ball_hit_normal_final_velocity_z)
+	
+	if LogConfig.bat_config == true:
+			print("hit")
+			print("final_ball_velocity: ", final_ball_velocity)
+	return final_ball_velocity
 
 
 func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_speed: float, bat_speed: float):
@@ -118,11 +161,11 @@ func batRot(time_to_hit: float, offset: float):
 	var degree_y = -(team_2.getCurrentBatter().tilt + rng.randf_range(-1,1)) - abs(degree_x)
 	
 	var angles_out: PackedFloat32Array
-	angles_out.append(degree_x)
-	angles_out.append(degree_y)
+	angles_out.append(rads_x)
+	angles_out.append(degree_y * (PI/180))
 	if LogConfig.bat_config == true:
-		print("Y degree ", degree_y)
-		print("X degree ", degree_x)
+		print("Y degree ", angles_out[1])
+		print("X degree ", angles_out[0])
 	return angles_out
 
 func predictPitch(can_react: bool ):
