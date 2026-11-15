@@ -12,7 +12,6 @@ const BALL_DIAMETER = 2.9
 const BALL_WEIGHT = 5.1
 
 
-
 func get_strikezone(height: int):
 	var strikezone = STRIKE_ZONE
 	strikezone.y = (height * Strike_zone_height_percent)

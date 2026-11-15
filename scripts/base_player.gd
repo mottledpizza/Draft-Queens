@@ -4,6 +4,7 @@ class_name base_player
 var player_name: String
 var height: float
 var age: int
+var distance_from_plate: float
 
 
 #pitching attributes
@@ -79,7 +80,3 @@ func getBat():
 		return null
 	else:
 		return bat
-	
-	
-	
-	

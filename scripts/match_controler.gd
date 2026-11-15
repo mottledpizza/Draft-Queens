@@ -54,13 +54,13 @@ func Bat(target: Vector2) -> void:
 	
 
 #IMPORTANT: DAVID! put the formula in this func pretty please
-func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
-ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float):
+func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, tilt: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
+ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: Vector2, ball_z_cord: float):
 	var final_ball_velocity
 	#bunch o nonsense, kill it all when you put in the equasion (womp womp too many typos)
 	if LogConfig.bat_config == true:
 		print("Bat X Angle is: ", bat_x_angle)
-		print("Bat Y Angle is: ", bat_y_angle)
+		print("Bat Tilt is: ", tilt)
 		#bat y angle is tilt
 		print("Ball Height is: ", ball_height)
 		print("Bat Height is: ", bat_height)
@@ -71,7 +71,10 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Ball Velocity is: ",ball_velocity)
 		print("Bat Velocity is: ", bat_velocity)
 		print("Bat Length is: ", bat_length)
-	
+	# new Variables!!!
+		print("Bat Y Angle is: ", bat_y_angle)
+		print("Bat Butt is: ", bat_cap)
+		print("bat Tip is: ", bat_tip)
 	if (abs(ball_height-bat_height) >= (ball_diameter+bat_diameter)):
 		final_ball_velocity = Vector3(-ball_velocity, 0, 0)
 		if LogConfig.bat_config == true:
@@ -83,7 +86,7 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 	var angle_of_collision = asin((ball_height-bat_height)/(ball_diameter+bat_diameter))
 	
 	#find hit aligned velocity of bat and ball (only velocity that affects collision)
-	var bat_hit_aligned_initial_velocity = cos(angle_of_collision - bat_y_angle) * bat_velocity
+	var bat_hit_aligned_initial_velocity = cos(angle_of_collision - tilt) * bat_velocity
 	var ball_hit_aligned_initial_velocity = cos(angle_of_collision) * cos(bat_x_angle) * ball_velocity
 	
 	#calculate final ball hit aligned velocity
@@ -130,42 +133,48 @@ func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_s
 	if (predicted_time_to_hit - ball_time) < 0:
 		#fyi it technically should be based off of the speed of the swing and the ball but uhhh i don't really care :P
 		var distance_offset = (ball_time - predicted_time_to_hit)/2
-		angles = batRot(predicted_time_to_hit,distance_offset)
+		angles = batRot(predicted_time_to_hit,distance_offset,target)
 		batPoints = createBatPoints(target)
-		batPoints = rotateBatFuction(batPoints,angles[1], ball_strike_point)
+		batPoints = rotateBatFuction(batPoints,angles[1], target)
 		if LogConfig.bat_config == true:
 			print("Swing is faster")
 	elif (predicted_time_to_hit - ball_time) > 0:
 		var distance_offset = (predicted_time_to_hit - ball_time)/2
-		angles = batRot(predicted_time_to_hit,-distance_offset)
+		angles = batRot(predicted_time_to_hit,-distance_offset,target)
 		batPoints = createBatPoints(target)
-		batPoints = rotateBatFuction(batPoints,angles[1], ball_strike_point)
+		batPoints = rotateBatFuction(batPoints,angles[1], target)
 		if LogConfig.bat_config == true:
 			print("Ball is faster!")
 	elif (predicted_time_to_hit - ball_time) == 0:
 		#statistically impossible... but just in case 
 		if LogConfig.bat_config == true:
 			print("Perfect!")
-	doesBallHitBat(batPoints, target)
-	calcBatPhysics(angles[0],angles[1],ball_strike_point.y,target.y,Baseball.BALL_DIAMETER,team_2.getCurrentBatter().getBat().bat_diameter,
-	Baseball.BALL_WEIGHT,team_2.getCurrentBatter().getBat().bat_weight, pitch_speed, bat_speed, team_2.getCurrentBatter().getBat().bat_length)
+	if doesBallHitBat(batPoints, ball_strike_point):
+		#WARNING got a random error here!!! no idea why needs checking
+		calcBatPhysics(angles[0],angles[1],angles[2],ball_strike_point.y,target.y,Baseball.BALL_DIAMETER,team_2.getCurrentBatter().getBat().bat_diameter,
+		Baseball.BALL_WEIGHT,team_2.getCurrentBatter().getBat().bat_weight, pitch_speed, bat_speed, team_2.getCurrentBatter().getBat().bat_length,
+		(batPoints[0] + batPoints[1])/2,(batPoints[2] + batPoints[3])/2, target,strike_zone.x)
 
 #gets the bat X angle
-func batRot(time_to_hit: float, offset: float):
+func batRot(time_to_hit: float, offset: float, target: Vector2):
 	var bat_speed = team_2.getCurrentBatter().swing_length / time_to_hit
 	var new_distance = (bat_speed * offset) * 12
 	var diamiter = team_2.getCurrentBatter().getBat().bat_length * 2
 	var rads_x = new_distance / (diamiter/2)
-	#only turns rads into degrees, can be removed if we're working in rads
-	var degree_x = rads_x * (180/PI)
-	var degree_y = -(team_2.getCurrentBatter().tilt + rng.randf_range(-1,1)) - abs(degree_x)
+	var bat_height = team_2.getCurrentBatter().height
+	bat_height = (bat_height *.48) + (target.y / 10)
+	print("Bat height is here: ",bat_height)
+	var rads_y = atan2(bat_height - target.y,target.x + 17 + team_2.getCurrentBatter().distance_from_plate)
+	var tilt = ((team_2.getCurrentBatter().tilt * (PI/180)) + rng.randf_range(-0.0872664626,0.0872664626)) - rads_x
 	
 	var angles_out: PackedFloat32Array
 	angles_out.append(rads_x)
-	angles_out.append(degree_y * (PI/180))
+	angles_out.append(rads_y)
+	angles_out.append(tilt )
 	if LogConfig.bat_config == true:
-		print("Y degree ", angles_out[1])
-		print("X degree ", angles_out[0])
+		print("Y Rads ", angles_out[1])
+		print("Tilt ", angles_out[2])
+		print("X Rads ", angles_out[0])
 	return angles_out
 
 func predictPitch(can_react: bool ):
@@ -205,7 +214,6 @@ func get_pitch_spin(pitch: String, pitch_sauce: float):
 	if team_1.getPitcher().pitch_dominant_hand == "L":
 		return pitch_type_info["L_Pitch"] * (pitch_sauce/100)
 
-
 #takes the perfered pitches in the player script and connects them to the pitch arsenals to select a pitch
 func select_pitch(thrown_pitch: String = "null", competence: float = 0.0 ):
 	var pitcher_arsenal: Array = team_1.getPitcher().pitching_arsenal.duplicate()
@@ -217,7 +225,6 @@ func select_pitch(thrown_pitch: String = "null", competence: float = 0.0 ):
 			pitch_weights.append(team_1.getPitcher().perfered_pitches[pitcher_arsenal[i]] * (((competence/2)/100) + 1 ))
 		else:
 			pitch_weights.append(team_1.getPitcher().perfered_pitches[pitcher_arsenal[i]])
-	
 	return pitcher_arsenal[rng.rand_weighted(pitch_weights)]
 
 func getWhereBallThrownFrom():
@@ -235,21 +242,26 @@ func createBatPoints(target: Vector2):
 	#array is formated that 0 is the top of the tip, 1 is the bottom of the tip
 	#2 is top of handle 3 is bottom of handle
 	var bat_points = []
-	vec2 = origin
-	vec2.x += bat.sweet_spot
-	vec2.y += height
-	bat_points.append(vec2)
+	var baseball_radius = Baseball.BALL_DIAMETER/2
 	vec2 = origin
 	vec2.x += bat.sweet_spot
 	vec2.y -= height
+	vec2 += Vector2(baseball_radius,-baseball_radius)
+	bat_points.append(vec2)
+	vec2 = origin
+	vec2.x += bat.sweet_spot
+	vec2.y += height
+	vec2 += Vector2(baseball_radius,baseball_radius)
 	bat_points.append(vec2)
 	vec2 = origin
 	vec2.x -= length - bat.sweet_spot
 	vec2.y += height
+	vec2 += Vector2(-baseball_radius,baseball_radius)
 	bat_points.append(vec2)
 	vec2 = origin
 	vec2.x -= length - bat.sweet_spot
 	vec2.y -= height
+	vec2 += Vector2(-baseball_radius,-baseball_radius)
 	bat_points.append(vec2)
 	#fuck dis shit^^^^
 	if LogConfig.bat_config == true:
@@ -258,20 +270,23 @@ func createBatPoints(target: Vector2):
 
 func rotateBatFuction(bat_points: Array, Angle: float, target: Vector2):
 	var origin = target
-	Angle = Angle * (PI/180)
+	Angle = -Angle
 	for i in bat_points.size():
+		#((-16243930 - 2755000*sin(129806113243103/100000000000000) + 7449997*cos(129806113243103/100000000000000))/1000000, -(-6522832 + 2755000*cos(129806113243103/100000000000000) + 7449997*sin(129806113243103/100000000000000))/1000000) ~~ (-16.890319057762316, -1.393901005856276)
 		var vec2 = bat_points[i]
+		var vectemp = Vector2.ZERO
 		vec2 -= target
-		vec2.x = (vec2.x * cos(Angle)) - (vec2.y * sin(Angle))
-		vec2.y = (vec2.y * cos(Angle)) + (vec2.x * sin(Angle))
-		vec2 += target
-		bat_points[i] = vec2
+		vectemp.x = (vec2.x * cos(Angle)) - (vec2.y * sin(Angle))
+		vectemp.y = (vec2.x * sin(Angle)) + (vec2.y * cos(Angle))
+		vectemp += target
+		bat_points[i] = vectemp
 	if LogConfig.bat_config == true:
 		print("Angled bat is: ",bat_points)
 	return bat_points
 
-func doesBallHitBat(points_in: Array, target: Vector2):
+func doesBallHitBat(points_in: PackedVector2Array, target: Vector2):
 	if Geometry2D.is_point_in_polygon(target,points_in):
 		print("HIT")
 	else:
 		print("STRIKE")
+	return Geometry2D.is_point_in_polygon(target,points_in)

@@ -12,3 +12,5 @@ func _init() -> void:
 	reaction_speed = 200
 	batting_compitence = 80.0
 	tilt = 33.0
+	
+	distance_from_plate = 7.0
