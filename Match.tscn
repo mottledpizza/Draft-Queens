@@ -99,7 +99,4 @@ size_flags_vertical = 0
 text = "AGAIN!"
 script = ExtResource("6_n7dpw")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MarginContainer" unique_id=2108178903]
-position = Vector2(396.7312, 219.14626)
-
 [connection signal="button_down" from="MarginContainer/Button" to="MarginContainer/Button" method="_on_button_down"]

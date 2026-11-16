@@ -75,6 +75,7 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Bat Y Angle is: ", bat_y_angle)
 		print("Bat Butt is: ", bat_cap)
 		print("bat Tip is: ", bat_tip)
+		print("Sweet Spot is:", bat_sweet_spot)
 	if (abs(ball_height-bat_height) >= (ball_diameter+bat_diameter)):
 		final_ball_velocity = Vector3(-ball_velocity, 0, 0)
 		if LogConfig.bat_config == true:
