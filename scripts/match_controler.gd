@@ -54,6 +54,8 @@ func Bat(target: Vector2) -> void:
 	swingBat(guessed_pitch, 766 / ((pitch_speed * 17.6)/1000), target, pitch_speed, bat_speed)
 	
 
+	
+
 #IMPORTANT: DAVID! put the formula in this func pretty please
 func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, tilt: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
 ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: float, ball_z_cord: float):
@@ -71,16 +73,36 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Bat Mass is: ", bat_mass)
 		print("Ball Velocity is: ",ball_velocity)
 		print("Bat Velocity is: ", bat_velocity)
+		#velocity is at sweet spot
 		print("Bat Length is: ", bat_length)
 	# new Variables!
 		print("Bat Y Angle is: ", bat_y_angle)
 		print("Bat Butt is: ", bat_cap)
 		print("bat Tip is: ", bat_tip)
 		print("Sweet Spot is:", bat_sweet_spot)
-	if (abs(ball_height-bat_height) >= (ball_diameter+bat_diameter)):
+		
+		
+	#build ball vector
+	#x is z here lo
+	var ball_yz_point = Vector2(ball_z_cord, ball_height)
+	print("ball zy point: ", ball_yz_point)
+	
+	#derive bat length as line equation
+	# form is y - bat_slope * x + constant = 0
+	var bat_slope = (bat_tip.y - bat_cap.y)/(bat_tip.x - bat_cap.x)
+	var constant = (bat_slope * bat_cap.x) - bat_cap.y
+	
+	#find closest bat point on the yz plane
+	var bat_collision_point = Vector2((bat_slope*((bat_slope*ball_yz_point.x) - ball_yz_point.y) - (constant))/(1 + pow(bat_slope, 2)), ((-(bat_slope*ball_yz_point.x) + ball_yz_point.y) - (bat_slope * constant))/(1 + pow(bat_slope, 2)))
+	var collision_yz_distance = bat_collision_point.distance_to(ball_yz_point)
+	
+	print("bat collision point: ", bat_collision_point)
+	
+	#check for hit
+	if (collision_yz_distance >= (ball_diameter+bat_diameter)):
 		final_ball_velocity = Vector3(-ball_velocity, 0, 0)
 		if LogConfig.bat_config == true:
-			print("strike")
+			print("ERROR: strike according to the hitting formula")
 			print("final_ball_velocity: ", final_ball_velocity)
 		return Vector3(-ball_velocity, 0, 0)
 	
