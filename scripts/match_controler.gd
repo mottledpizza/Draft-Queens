@@ -154,7 +154,7 @@ func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_s
 		#WARNING got a random error here!!! no idea why needs checking
 		calcBatPhysics(angles[0],angles[1],angles[2],ball_strike_point.y,target.y,Baseball.BALL_DIAMETER,team_2.getCurrentBatter().getBat().bat_diameter,
 		Baseball.BALL_WEIGHT,team_2.getCurrentBatter().getBat().bat_weight, pitch_speed, bat_speed, team_2.getCurrentBatter().getBat().bat_length,
-		(batPoints[0] + batPoints[1])/2,(batPoints[2] + batPoints[3])/2, team_2.getCurrentBatter().getBat().sweet_spot,strike_zone.x)
+		(batPoints[2] + batPoints[3])/2, (batPoints[0] + batPoints[1])/2, team_2.getCurrentBatter().getBat().sweet_spot,strike_zone.x)
 
 #gets the bat X angle
 func batRot(time_to_hit: float, offset: float, target: Vector2):
