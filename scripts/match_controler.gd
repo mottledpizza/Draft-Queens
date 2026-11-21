@@ -58,7 +58,7 @@ func Bat(target: Vector2) -> void:
 
 #IMPORTANT: DAVID! put the formula in this func pretty please
 func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, tilt: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
-ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: float, ball_z_cord: float):
+ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: float, ball_z_cord: float, coefficient_of_restitution: float = 0.4):
 	var final_ball_velocity
 	#bunch o nonsense, kill it all when you put in the equasion (womp womp too many typos)
 	if LogConfig.bat_config == true:
@@ -80,63 +80,72 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Bat Butt is: ", bat_cap)
 		print("bat Tip is: ", bat_tip)
 		print("Sweet Spot is:", bat_sweet_spot)
-		
-		
+	#vectorize ball velocity
+	var ball_initial_velocity = Vector3(-ball_velocity, 0, 0)
+	
 	#build ball vector
 	#x is z here lo
 	var ball_yz_point = Vector2(ball_z_cord, ball_height)
-	print("ball zy point: ", ball_yz_point)
-	
+
 	#derive bat length as line equation
 	# form is y - bat_slope * x + constant = 0
-	var bat_slope = (bat_tip.y - bat_cap.y)/(bat_tip.x - bat_cap.x)
-	var constant = (bat_slope * bat_cap.x) - bat_cap.y
+	var bat_slope = -1*(bat_tip.y - bat_cap.y)/(bat_tip.x - bat_cap.x)
+	var constant = (-1* bat_slope * bat_cap.x) - bat_cap.y
 	
 	#find closest bat point on the yz plane
-	var bat_collision_point = Vector2((bat_slope*((bat_slope*ball_yz_point.x) - ball_yz_point.y) - (constant))/(1 + pow(bat_slope, 2)), ((-(bat_slope*ball_yz_point.x) + ball_yz_point.y) - (bat_slope * constant))/(1 + pow(bat_slope, 2)))
+	var bat_collision_point = Geometry2D.get_closest_point_to_segment(ball_yz_point,bat_tip,bat_cap)
 	var collision_yz_distance = bat_collision_point.distance_to(ball_yz_point)
 	
-	print("bat collision point: ", bat_collision_point)
+	#calculate linear velocity of bat at point of collision
+	var bat_angular_velocity = bat_velocity / bat_sweet_spot
+	var initial_bat_linear_velocity = bat_angular_velocity * bat_collision_point.distance_to(bat_cap)
+	var bat_normalized_velocity_vector = Vector3(cos(bat_x_angle) * cos(tilt),sin(tilt), sin(bat_x_angle) * cos(tilt))
+	
+	#PLACEHOLDER: not using angular stuff
+	var bat_initial_velocity = bat_velocity * bat_normalized_velocity_vector
 	
 	#check for hit
 	if (collision_yz_distance >= (ball_diameter+bat_diameter)):
-		final_ball_velocity = Vector3(-ball_velocity, 0, 0)
+		print("collision_yz_distance: ", collision_yz_distance)
+		#STRIKE
+		final_ball_velocity = ball_initial_velocity
 		if LogConfig.bat_config == true:
 			print("ERROR: strike according to the hitting formula")
 			print("final_ball_velocity: ", final_ball_velocity)
 		return Vector3(-ball_velocity, 0, 0)
 	
-	#calculate angle of collision
-	var angle_of_collision = asin((ball_height-bat_height)/(ball_diameter+bat_diameter))
+	# construct collision vector
+	var collision_x_angle = acos(collision_yz_distance/(bat_diameter+ball_diameter))
+	var collision_yz_vector = ball_yz_point - bat_collision_point
+	var collision_x_component = sqrt(pow((bat_diameter+ball_diameter), 2) - pow(collision_yz_distance, 2))
+	var collision_vector = Vector3(collision_x_component, collision_yz_vector.y, collision_yz_vector.x).normalized()
+	
+	# construct collision plane
+	var collision_plane = Plane(collision_vector)
 	
 	#find hit aligned velocity of bat and ball (only velocity that affects collision)
-	var bat_hit_aligned_initial_velocity = cos(angle_of_collision - tilt) * bat_velocity
-	var ball_hit_aligned_initial_velocity = cos(angle_of_collision) * cos(bat_x_angle) * ball_velocity
-	
+	var ball_hit_normal_velocity = collision_plane.project(ball_initial_velocity)
+	var bat_hit_normal_velocity = collision_plane.project(bat_initial_velocity)
+	var bat_hit_aligned_initial_velocity = (bat_initial_velocity - bat_hit_normal_velocity).length()
+	var ball_hit_aligned_initial_velocity = -1*(ball_initial_velocity - ball_hit_normal_velocity).length()
+
 	#calculate final ball hit aligned velocity
-	var coefficient_of_restitution = .7 #LOL #TODO: LOL
 	var ball_hit_aligned_final_velocity = ((bat_mass*bat_hit_aligned_initial_velocity) + (ball_mass*ball_hit_aligned_initial_velocity) + (bat_mass*coefficient_of_restitution*(bat_hit_aligned_initial_velocity-ball_hit_aligned_initial_velocity)))/(bat_mass+ball_mass)
 	
-	#okay time to reconstruct the velocity into its constituent parts
-	# since we decomposed the ball velocity twice to align it with the hit, the remaining velocity is
-	 #the addition of two vectors
-	var ball_hit_normal_velocity = sqrt(pow(sin(angle_of_collision) * ball_velocity, 2.0) + pow(cos(angle_of_collision) * sin(bat_x_angle) * ball_velocity, 2.0))
+	#okay time to reconstruct the velocity from its constituent parts
 	
-	#decomp :)
-	var ball_hit_aligned_final_velocity_x = cos(bat_x_angle) * cos(angle_of_collision) * ball_hit_aligned_final_velocity
-	var ball_hit_normal_final_velocity_x = sin(bat_x_angle) * cos(angle_of_collision) * ball_hit_normal_velocity * -1 #(presumably negative)
-	
-	var ball_hit_aligned_final_velocity_y = cos(bat_x_angle) * sin(angle_of_collision) * ball_hit_aligned_final_velocity
-	var ball_hit_normal_final_velocity_y = cos(bat_x_angle) * sin(angle_of_collision) * ball_hit_normal_velocity
-	
-	var ball_hit_aligned_final_velocity_z = sin(bat_x_angle) * cos(angle_of_collision) * ball_hit_aligned_final_velocity
-	var ball_hit_normal_final_velocity_z = cos(bat_x_angle) * cos(angle_of_collision) * ball_hit_normal_velocity * (bat_x_angle / abs(bat_x_angle))
-	#added sign on x angle manually to normal velocity
-	
-	final_ball_velocity = Vector3(ball_hit_aligned_final_velocity_x + ball_hit_normal_final_velocity_x, ball_hit_aligned_final_velocity_y + ball_hit_normal_final_velocity_y, ball_hit_aligned_final_velocity_z + ball_hit_normal_final_velocity_z)
-	
+	final_ball_velocity = (ball_hit_aligned_final_velocity * collision_vector) + ball_hit_normal_velocity
+
 	if LogConfig.bat_config == true:
 			print("hit")
+			print("bat collision point: ", bat_collision_point)
+			print("collision_vector: ", collision_vector)
+			print("ball_initial_velocity: ", ball_initial_velocity)
+			print("bat_initial_velocity: ", bat_initial_velocity)
+			print("bat_hit_aligned_initial_velocity: ", bat_hit_aligned_initial_velocity)
+			print("ball_hit_aligned_initial_velocity: ", ball_hit_aligned_initial_velocity)
+			print("ball_hit_aligned_final_velocity: ", ball_hit_aligned_final_velocity)
+			print("ball_hit_normal_velocity: ", ball_hit_normal_velocity)
 			print("final_ball_velocity: ", final_ball_velocity)
 	return final_ball_velocity
 
