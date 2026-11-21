@@ -16,6 +16,7 @@ func _ready() -> void:
 func playDaGame():
 	var target = Pitch()
 	Bat(target)
+	
 
 func Pitch():
 	thrown_pitch = select_pitch()
@@ -55,7 +56,7 @@ func Bat(target: Vector2) -> void:
 
 #IMPORTANT: DAVID! put the formula in this func pretty please
 func calcBatPhysics(bat_x_angle: float, bat_y_angle: float, tilt: float, ball_height: float, bat_height: float, ball_diameter: float, bat_diameter: float, 
-ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: Vector2, ball_z_cord: float):
+ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat_length: float, bat_cap: Vector2, bat_tip: Vector2,bat_sweet_spot: float, ball_z_cord: float):
 	var final_ball_velocity
 	#bunch o nonsense, kill it all when you put in the equasion (womp womp too many typos)
 	if LogConfig.bat_config == true:
@@ -71,7 +72,7 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 		print("Ball Velocity is: ",ball_velocity)
 		print("Bat Velocity is: ", bat_velocity)
 		print("Bat Length is: ", bat_length)
-	# new Variables!!!
+	# new Variables!
 		print("Bat Y Angle is: ", bat_y_angle)
 		print("Bat Butt is: ", bat_cap)
 		print("bat Tip is: ", bat_tip)
@@ -117,7 +118,6 @@ ball_mass: float, bat_mass:float, ball_velocity: float, bat_velocity: float, bat
 			print("final_ball_velocity: ", final_ball_velocity)
 	return final_ball_velocity
 
-
 func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_speed: float, bat_speed: float):
 	var target = Vector2.ZERO
 	target = ball_target + get_pitch_spin(guessed_pitch, team_1.getPitcher().pitching_sauce) - calc_grav(guessed_pitch,pitch_speed)
@@ -154,7 +154,7 @@ func swingBat(guessed_pitch: String, ball_time: float,ball_strike_point, pitch_s
 		#WARNING got a random error here!!! no idea why needs checking
 		calcBatPhysics(angles[0],angles[1],angles[2],ball_strike_point.y,target.y,Baseball.BALL_DIAMETER,team_2.getCurrentBatter().getBat().bat_diameter,
 		Baseball.BALL_WEIGHT,team_2.getCurrentBatter().getBat().bat_weight, pitch_speed, bat_speed, team_2.getCurrentBatter().getBat().bat_length,
-		(batPoints[0] + batPoints[1])/2,(batPoints[2] + batPoints[3])/2, target,strike_zone.x)
+		(batPoints[0] + batPoints[1])/2,(batPoints[2] + batPoints[3])/2, team_2.getCurrentBatter().getBat().sweet_spot,strike_zone.x)
 
 #gets the bat X angle
 func batRot(time_to_hit: float, offset: float, target: Vector2):
@@ -273,7 +273,6 @@ func rotateBatFuction(bat_points: Array, Angle: float, target: Vector2):
 	var origin = target
 	Angle = -Angle
 	for i in bat_points.size():
-		#((-16243930 - 2755000*sin(129806113243103/100000000000000) + 7449997*cos(129806113243103/100000000000000))/1000000, -(-6522832 + 2755000*cos(129806113243103/100000000000000) + 7449997*sin(129806113243103/100000000000000))/1000000) ~~ (-16.890319057762316, -1.393901005856276)
 		var vec2 = bat_points[i]
 		var vectemp = Vector2.ZERO
 		vec2 -= target

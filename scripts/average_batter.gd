@@ -14,3 +14,6 @@ func _init() -> void:
 	tilt = 33.0
 	
 	distance_from_plate = 7.0
+	
+	Sprint_speed = 27
+	acceleration_time = 3

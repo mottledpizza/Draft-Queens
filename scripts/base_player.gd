@@ -67,7 +67,10 @@ var batting_compitence: float
 var tilt: float
 
 #Fielding Stats
-
+#measured in feet per second. Average is 27
+var Sprint_speed: float
+#how long it takes to hit top speed. Average is 3. In seconds
+var acceleration_time: float
 
 #Functions:
 func getBat():
